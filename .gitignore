@@ -1,0 +1,85 @@
+__pycache__/
+*.py[cod]
+*$py.class
+
+.DS_Store
+.cache
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+.pytest_cache/
+
+# Sphinx documentation
+docs/_build/
+
+# pyenv
+.python-version
+
+__pypackages__/
+
+# Celery stuff
+celerybeat-schedule
+celerybeat.pid
+
+# SageMath parsed files
+*.sage.py
+
+# Environments
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+.idea
+.vscode
+.env.prod
+
+# mkdocs documentation
+/site
+
+# mypy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Pyre type checker
+.pyre/
+
+# JS & NODE
+node_modules/
+
+*.code-workspace
+.editorconfig
+*.sqlite3
+
+# Logs
+*.log
+
+# DB
+postgres/
+pgsql_data
+
+# Data in data folder
+data/
+
+# Media
+*src/django/bella/media/
+!.gitignore
+media/
+
+# SC
+.scannerwork/
+
+# Static
+static/

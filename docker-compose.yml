@@ -1,0 +1,90 @@
+version: "3.8"
+services:
+#  redis:
+#    image: redis:alpine
+#    networks:
+#      - django-network
+
+  app:
+    build:
+      context: .
+      dockerfile: ./docker/django.local.dockerfile
+    container_name: app_budget
+    env_file:
+      - ./.env
+    ports:
+      - "8000:8000"
+    environment:
+      - DJANGO_SETTINGS_MODULE=config.settings
+#    command: tail -f /dev/null
+    command: "python3 manage.py runserver 0.0.0.0:8000"
+    volumes:
+      - .:/app
+    networks:
+      - budget-network
+    depends_on:
+      - db
+#      - redis
+
+  db:
+    build:
+      context: .
+      dockerfile: ./docker/pgsql.local.dockerfile
+    container_name: db_budget
+    restart: always
+    env_file:
+      - ./.env
+    ports:
+      - "127.0.0.1:5432:5432"
+    volumes:
+      - ./data/budget_pgdb:/var/lib/postgresql/data
+    networks:
+      - budget-network
+#
+#  worker:
+#    restart: always
+#    build:
+#      context: .
+#      dockerfile: ./docker/django.local.dockerfile
+#    env_file:
+#      - ./.env
+#    environment:
+#      - DJANGO_SETTINGS_MODULE=config.settings
+#    container_name: budget_worker
+##    command: tail -f /dev/null
+#    command: ['celery', '-A', 'config', 'worker', '-l', 'INFO']
+#    volumes:
+#      - .:/app
+#    depends_on:
+#        - db
+#        - redis
+#        - app
+#    networks:
+#        - budget-network
+#
+#  beat:
+#    restart: always
+#    build:
+#      context: .
+#      dockerfile: ./docker/django.local.dockerfile
+#    env_file:
+#      - ./.env
+#    environment:
+#      - DJANGO_SETTINGS_MODULE=config.settings
+#    container_name: budget_beat
+#    #    command: tail -f /dev/null
+#    command: [ 'celery', '-A', 'config', 'beat', '-l', 'INFO' ]
+#    volumes:
+#      - .:/app
+#    depends_on:
+#      - db
+#      - redis
+#      - app
+#      - worker
+#    networks:
+#      - budget-network
+#
+
+networks:
+    budget-network:
+        driver: bridge
