@@ -23,10 +23,10 @@ start_:
 	@docker-compose up
 
 run:
-	@docker-compose exec -d worker celery --workdir ./src/django/bella --app bella worker --loglevel INFO && docker-compose exec django python3 src/django/bella/manage.py runserver 0.0.0.0:8000
+	@docker-compose exec -d worker celery --workdir ./config --app config worker --loglevel INFO && docker-compose exec app python3 manage.py runserver 0.0.0.0:8000
 
 run_w:
-	@docker-compose exec worker celery --workdir ./src/django/bella --app bella worker --loglevel INFO
+	@docker-compose exec worker celery --workdir ./congig --app config worker --loglevel INFO
 
 run_:
 	@docker-compose exec app python3 manage.py runserver 0.0.0.0:8000
