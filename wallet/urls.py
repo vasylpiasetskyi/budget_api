@@ -1,24 +1,25 @@
 from django.urls import path
 
-from wallet.views import AccountAPIList, AccountAPIDetail, CategoryAPIList, CategoryAPIDetail, SubCategoryAPIList, \
-    SubCategoryAPIDetail, CategoryAPICreate, SubCategoryAPICreate, TransactionAPIList, TransactionAPICreate
+from wallet import views
 
 urlpatterns = [
-    path('account/', AccountAPIList.as_view()),
-    path('account/<int:pk>/', AccountAPIDetail.as_view()),
+    path('account/', views.AccountAPIList.as_view()),
+    path('account/<int:pk>/', views.AccountAPIDetail.as_view()),
 
-    path('category/', CategoryAPIList.as_view()),
-    path('category/create/', CategoryAPICreate.as_view()),
+    path('category/', views.CategoryAPIList.as_view()),
+    path('category/create/', views.CategoryAPICreate.as_view()),
 
-    path('category/<int:pk>/', CategoryAPIDetail.as_view()),
-    path('category/<int:pk>/subcategory/', SubCategoryAPIList.as_view()),
-    path('category/<int:pk>/subcategory/create/', SubCategoryAPICreate.as_view()),
+    path('category/<int:pk>/', views.CategoryAPIDetail.as_view()),
+    path('category/<int:pk>/subcategory/', views.SubCategoryAPIList.as_view()),
+    path('category/<int:pk>/subcategory/create/', views.SubCategoryAPICreate.as_view()),
+    path('category/<int:pk>/subcategory/<int:sub_pk>/', views.SubCategoryAPIDetail.as_view()),
 
-    path('category/<int:pk>/subcategory/<int:sub_pk>/', SubCategoryAPIDetail.as_view()),
+    path('subcategory/', views.SubCategoryAPIList.as_view()),
+    path('subcategory/create/', views.SubCategoryAPICreateStaff.as_view()),
+    path('subcategory/<int:pk>/', views.SubCategoryAPIDetailStaff.as_view()),
 
-    path('transaction/', TransactionAPIList.as_view()),
-    path('transaction/create/', TransactionAPICreate.as_view()),
-    path('transaction/transfer/', TransactionAPICreate.as_view()),
-    # path('transaction/<int:pk>/', TransactionAPIDetail.as_view()),
+    path('transaction/', views.TransactionAPIList.as_view()),
+    path('transaction/create/', views.TransactionAPICreate.as_view()),
+    # path('transaction/<int:pk>/', views.TransactionAPIDetail.as_view()),
 
 ]

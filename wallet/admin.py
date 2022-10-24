@@ -8,7 +8,7 @@ class CurrencyAdmin(admin.ModelAdmin):
 
 
 class AccountAdmin(admin.ModelAdmin):
-    list_display = ("account_type", "name", "balance", "owner", "currency", )
+    list_display = ("account_type", "name", "balance", "owner", "currency",)
 
 
 class CategoryAdmin(admin.ModelAdmin):
@@ -20,7 +20,7 @@ class SubCategoryAdmin(admin.ModelAdmin):
 
 
 class TransactionAdmin(admin.ModelAdmin):
-    list_display = ("action", "category", "amount", "description",
+    list_display = ("action", "category", "sub_category", "amount", "description",
                     "date", "owner", "from_account", "to_account", "created_at", "updated_at")
 
 

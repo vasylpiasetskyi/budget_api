@@ -50,7 +50,7 @@ class Category(models.Model):
 
 class SubCategory(models.Model):
     name = models.CharField(max_length=255)
-    category = models.ForeignKey(Category, related_name="sub_category_category", on_delete=models.CASCADE)
+    category = models.ForeignKey(Category, related_name="sub_category", on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     is_active = models.BooleanField(default=True)
