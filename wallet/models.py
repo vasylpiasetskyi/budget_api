@@ -8,6 +8,7 @@ class Currency(models.Model):
     exchange = models.DecimalField(decimal_places=6, max_digits=16)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    is_active = models.BooleanField(default=True)
 
     def __str__(self):
         return f"{self.code} - {self.name}"
@@ -26,6 +27,7 @@ class Account(models.Model):
     currency = models.ForeignKey(Currency, related_name="accounts_currency", on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    is_active = models.BooleanField(default=True)
 
     def __str__(self):
         return self.name
@@ -41,8 +43,8 @@ class Category(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     owner = models.ForeignKey(User, related_name="category_user", on_delete=models.CASCADE)
     category_type = models.CharField(choices=CATEGORY_OPTIONS, max_length=45)
-    is_active = models.BooleanField(default=True)
     currency = models.ForeignKey(Currency, related_name="category_currency", on_delete=models.CASCADE)
+    is_active = models.BooleanField(default=True)
 
     def __str__(self):
         return f"{self.category_type} - {self.name} - {self.owner}"

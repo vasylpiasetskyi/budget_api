@@ -22,13 +22,13 @@ class CurrencySerializer(serializers.ModelSerializer):
 class AccountListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Account
-        fields = ("account_type", "name", "balance", "owner", "currency")
+        fields = ("id", "account_type", "name", "balance", "owner", "currency")
 
 
 class AccountDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = Account
-        fields = ("__all__")
+        fields = "__all__"
 
 
 # SUBCATEGORY ###
@@ -106,8 +106,5 @@ class TransactionCreateSerializer(serializers.ModelSerializer):
         return transaction
 
 
-class TransactionUpdateSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Transaction
-        exclude = ("created_at", "updated_at", "owner")
-
+class TransactionUpdateSerializer(TransactionCreateSerializer):
+    pass

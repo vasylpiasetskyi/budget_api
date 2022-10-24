@@ -20,6 +20,6 @@ urlpatterns = [
 
     path('transaction/', views.TransactionAPIList.as_view()),
     path('transaction/create/', views.TransactionAPICreate.as_view()),
-    # path('transaction/<int:pk>/', views.TransactionAPIDetail.as_view()),
+    path('transaction/<int:pk>/', views.SubCategoryAPIDetailStaff.as_view()),
 
 ]

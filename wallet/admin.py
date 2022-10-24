@@ -12,7 +12,7 @@ class AccountAdmin(admin.ModelAdmin):
 
 
 class CategoryAdmin(admin.ModelAdmin):
-    list_display = ("category_type", "name", "owner", "is_active", "created_at", "updated_at")
+    list_display = ("id", "category_type", "name", "owner", "is_active", "created_at", "updated_at")
 
 
 class SubCategoryAdmin(admin.ModelAdmin):

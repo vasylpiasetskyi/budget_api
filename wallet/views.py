@@ -1,5 +1,6 @@
 import decimal
 
+from django.db.models import Q
 from rest_framework import generics, status
 from rest_framework.exceptions import NotFound
 from rest_framework.response import Response
@@ -10,8 +11,9 @@ from wallet.serializers import (AccountListSerializer, AccountDetailSerializer, 
                                 SubCategoryUpdateSerializer, TransactionSerializer, TransactionCreateSerializer,
                                 SubCategoryCreateSerializerStaff,
                                 TransactionUpdateSerializer,
-
                                 )
+
+from wallet.services import service_perform_create, update_accounts_balance
 
 
 # ACCOUNT VIEW ###
@@ -24,10 +26,17 @@ class AccountAPIList(generics.ListAPIView):
         return Account.objects.all().filter(owner=self.request.user)
 
 
-class AccountAPIDetail(generics.RetrieveAPIView):
-    """GET, HEAD, OPTIONS"""
+class AccountAPIDetail(generics.RetrieveUpdateDestroyAPIView):
+    """GET, PUT, PATCH, DELETE, HEAD, OPTION"""
     queryset = Account.objects.all()
     serializer_class = AccountDetailSerializer
+
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+        transactions = Transaction.objects.filter(Q(from_account=instance.id) | Q(to_account=instance.id))
+        for transaction in transactions:
+            transaction.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 # CATEGORY VIEW ###
@@ -49,6 +58,17 @@ class CategoryAPIDetail(generics.RetrieveUpdateDestroyAPIView):
     """GET, PUT, PATCH, DELETE, HEAD, OPTION"""
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
+
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+
+        transactions = Transaction.objects.filter(category=instance.id)
+        for transaction in transactions:
+            update_accounts_balance(transaction)
+            transaction.delete()
+
+        self.perform_destroy(instance)
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 # SUBCATEGORY VIEW ###
@@ -115,60 +135,8 @@ class TransactionAPICreate(generics.CreateAPIView):
     serializer_class = TransactionCreateSerializer
     queryset = Transaction.objects.all()
 
-    # def get_serializer_class(self):
-    #     if "transfer" in str(self.request):
-    #         return TransactionCreateTransferSerializer
-    #     return TransactionCreateSerializer
-
     def perform_create(self, serializer):
-        from_account = None
-        to_account = None
-        owner = self.request.user
-        category = serializer.validated_data.get('category')
-        sub_category = serializer.validated_data.get('sub_category')
-
-        if category and category.owner != owner:
-            raise NotFound(detail=f"Error 403, Category does not meet the {owner.username}", code=403)
-
-        if serializer.validated_data.get('from_account'):
-            from_account = Account.objects.get(id=serializer.validated_data.get('from_account').id)
-            if from_account.owner != owner:
-                raise NotFound(detail=f"Error 403, Account does not meet the {owner.username}", code=403)
-
-        if serializer.validated_data.get('to_account'):
-            to_account = Account.objects.get(id=serializer.validated_data.get('to_account').id)
-            if to_account.owner != owner:
-                raise NotFound(detail=f"Error 403, Account does not meet the {owner.username}", code=403)
-
-        if serializer.validated_data.get('action') == "INCOME":
-            if category and category.category_type != "INCOME":
-                raise NotFound(detail=f"Error 403, Category does not meet the INCOME", code=403)
-            if sub_category and sub_category.category.category_type != "INCOME":
-                raise NotFound(detail=f"Error 403, SubCategory does not meet the INCOME", code=403)
-            to_account.balance = to_account.balance + decimal.Decimal(serializer.validated_data.get('amount'))
-            to_account.save()
-            serializer.save(from_account=None)
-
-        if serializer.validated_data.get('action') == "EXPENSE":
-            if category and category.category_type != "EXPENSE":
-                raise NotFound(detail=f"Error 403, Category does not meet the EXPENSE", code=403)
-            if sub_category and sub_category.category.category_type != "EXPENSE":
-                raise NotFound(detail=f"Error 403, SubCategory does not meet the EXPENSE", code=403)
-            from_account.balance = from_account.balance - decimal.Decimal(serializer.validated_data.get('amount'))
-            from_account.save()
-            serializer.save(to_account=None)
-
-        if serializer.validated_data.get('action') == "TRANSFER":
-            if not from_account or not to_account:
-                raise NotFound(detail=f"Error 403, Transfer required FROM and TO accounts", code=403)
-            if category or sub_category:
-                raise NotFound(detail=f"Error 403, Transfer does not have Category or SubCategory", code=403)
-            to_account.balance = to_account.balance + decimal.Decimal(serializer.validated_data.get('amount'))
-            from_account.balance = from_account.balance - decimal.Decimal(serializer.validated_data.get('amount'))
-            to_account.save()
-            serializer.save(category=None, sub_category=None)
-
-        return serializer
+        return service_perform_create(self, serializer)
 
 
 class SubCategoryAPIDetailStaff(generics.RetrieveUpdateDestroyAPIView):
@@ -176,16 +144,11 @@ class SubCategoryAPIDetailStaff(generics.RetrieveUpdateDestroyAPIView):
     queryset = Transaction.objects.all()
     serializer_class = TransactionUpdateSerializer
 
+    def perform_update(self, serializer):
+        return service_perform_create(self, serializer)
 
-
-
-# class SubCategoryAPIDetail(generics.RetrieveUpdateDestroyAPIView):
-#     """GET, PUT, PATCH, DELETE, HEAD, OPTIONS"""
-#     serializer_class = SubCategoryUpdateSerializer
-#     lookup_field = 'pk'
-#     lookup_url_kwarg = 'sub_pk'
-#
-#     def get_queryset(self):
-#         pk = self.kwargs.get('pk', None)
-#         sub_pk = self.kwargs.get('sub_pk', None)
-#         return SubCategory.objects.all().filter(category=pk, id=sub_pk)
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+        update_accounts_balance(instance)
+        self.perform_destroy(instance)
+        return Response(status=status.HTTP_204_NO_CONTENT)
