@@ -15,7 +15,7 @@ class RecursiveSerializer(serializers.Serializer):
 class CurrencySerializer(serializers.ModelSerializer):
     class Meta:
         model = Currency
-        fields = ("name", "code", "exchange")
+        fields = ("id", "name", "code", "exchange")
 
 
 # ACCOUNT ###
@@ -23,6 +23,25 @@ class AccountListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Account
         fields = ("id", "account_type", "name", "balance", "owner", "currency")
+
+
+class AccountCreateSerializer(serializers.ModelSerializer):
+    owner = serializers.HiddenField(default=serializers.CurrentUserDefault())
+
+    class Meta:
+        model = Account
+        fields = ("account_type", "name", "balance", "owner", "currency")
+
+    def create(self, validated_data):
+        account, _ = Account.objects.update_or_create(
+            account_type=validated_data.get('account_type', "Regular"),
+            name=validated_data.get('name', "Money"),
+            balance=validated_data.get('balance', 0),
+            owner=validated_data.get('owner', 0),
+            # owner=self.context['request'].user,
+            currency=validated_data.get('currency', 0),
+        )
+        return account
 
 
 class AccountDetailSerializer(serializers.ModelSerializer):
@@ -47,7 +66,7 @@ class SubCategoryCreateSerializer(serializers.ModelSerializer):
 class SubCategoryCreateSerializerStaff(serializers.ModelSerializer):
     class Meta:
         model = SubCategory
-        fields = ("name", "category")
+        fields = ("id", "name", "category")
 
 
 class SubCategoryUpdateSerializer(SubCategoryCreateSerializer):
@@ -61,7 +80,8 @@ class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
         fields = (
-            "id", "name", "sub_category", "owner", "category_type", "currency", "is_active", "created_at", "updated_at")
+            "id", "name", "sub_category", "owner", "category_type", "currency", "is_active", "created_at", "updated_at"
+        )
 
 
 class CategoryCreateSerializer(serializers.ModelSerializer):
@@ -83,7 +103,7 @@ class CategoryCreateSerializer(serializers.ModelSerializer):
 class TransactionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Transaction
-        fields = ("__all__")
+        fields = "__all__"
 
 
 class TransactionCreateSerializer(serializers.ModelSerializer):
