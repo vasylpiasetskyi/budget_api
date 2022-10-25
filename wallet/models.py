@@ -75,7 +75,9 @@ class Transaction(models.Model):
     sub_category = models.ForeignKey(SubCategory, related_name="transactions_sub_category", on_delete=models.SET_NULL,
                                      blank=True,
                                      null=True)
-    amount = models.DecimalField(decimal_places=2, max_digits=12)
+    from_amount = models.DecimalField(decimal_places=2, max_digits=12)
+    to_amount = models.DecimalField(decimal_places=2, max_digits=12)
+
     description = models.CharField(max_length=255, blank=True, null=True)
     date = models.DateTimeField(auto_now_add=True)
     owner = models.ForeignKey(User, related_name="transactions_user", on_delete=models.CASCADE)

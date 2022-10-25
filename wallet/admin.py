@@ -20,7 +20,7 @@ class SubCategoryAdmin(admin.ModelAdmin):
 
 
 class TransactionAdmin(admin.ModelAdmin):
-    list_display = ("action", "category", "sub_category", "amount", "description",
+    list_display = ("action", "category", "sub_category", "from_amount", "to_amount", "description",
                     "date", "owner", "from_account", "to_account", "created_at", "updated_at")
 
 

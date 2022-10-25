@@ -157,7 +157,7 @@ class TransactionAPICreate(generics.CreateAPIView):
         return service_perform_create(self, serializer)
 
 
-class SubCategoryAPIDetailStaff(generics.RetrieveUpdateDestroyAPIView):
+class TransactionAPIDetailStaff(generics.RetrieveUpdateDestroyAPIView):
     """GET, PUT, PATCH, DELETE, HEAD, OPTIONS"""
     queryset = Transaction.objects.all()
     serializer_class = TransactionUpdateSerializer

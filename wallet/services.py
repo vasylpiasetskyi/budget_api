@@ -30,7 +30,7 @@ def service_perform_create(self, serializer):
             raise NotFound(detail=f"Error 403, Category does not related to the INCOME", code=403)
         if sub_category and sub_category.category.category_type != "INCOME":
             raise NotFound(detail=f"Error 403, SubCategory does not related to the INCOME", code=403)
-        to_account.balance = to_account.balance + decimal.Decimal(serializer.validated_data.get('amount'))
+        to_account.balance = to_account.balance + decimal.Decimal(serializer.validated_data.get('to_amount'))
         to_account.save()
         serializer.save(from_account=None)
 
@@ -39,7 +39,7 @@ def service_perform_create(self, serializer):
             raise NotFound(detail=f"Error 403, Category does not related to the EXPENSE", code=403)
         if sub_category and sub_category.category.category_type != "EXPENSE":
             raise NotFound(detail=f"Error 403, SubCategory does not related to the EXPENSE", code=403)
-        from_account.balance = from_account.balance - decimal.Decimal(serializer.validated_data.get('amount'))
+        from_account.balance = from_account.balance - decimal.Decimal(serializer.validated_data.get('from_amount'))
         from_account.save()
         serializer.save(to_account=None)
 
@@ -48,9 +48,10 @@ def service_perform_create(self, serializer):
             raise NotFound(detail=f"Error 403, Transfer required FROM and TO accounts", code=403)
         if category or sub_category:
             raise NotFound(detail=f"Error 403, Transfer does not have Category or SubCategory", code=403)
-        to_account.balance = to_account.balance + decimal.Decimal(serializer.validated_data.get('amount'))
-        from_account.balance = from_account.balance - decimal.Decimal(serializer.validated_data.get('amount'))
+        to_account.balance = to_account.balance + decimal.Decimal(serializer.validated_data.get('to_amount'))
+        from_account.balance = from_account.balance - decimal.Decimal(serializer.validated_data.get('from_amount'))
         to_account.save()
+        from_account.save()
         serializer.save(category=None, sub_category=None)
 
     return serializer
@@ -66,8 +67,8 @@ def update_accounts_balance(instance):
         to_account = Account.objects.filter(id=instance.to_account.id).first()
 
     if from_account:
-        from_account.balance = from_account.balance + instance.amount
+        from_account.balance = from_account.balance + instance.from_amount
         from_account.save()
     if to_account:
-        to_account.balance = to_account.balance - instance.amount
+        to_account.balance = to_account.balance - instance.to_amount
         to_account.save()

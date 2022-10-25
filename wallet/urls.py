@@ -4,7 +4,6 @@ from wallet import views
 
 urlpatterns = [
 
-
     # Account
     path('account/', views.AccountAPIList.as_view()),
     path('account/create/', views.AccountAPICreate.as_view()),
@@ -27,6 +26,6 @@ urlpatterns = [
     # Transaction
     path('transaction/', views.TransactionAPIList.as_view()),
     path('transaction/create/', views.TransactionAPICreate.as_view()),
-    path('transaction/<int:pk>/', views.SubCategoryAPIDetailStaff.as_view()),
+    path('transaction/<int:pk>/', views.TransactionAPIDetailStaff.as_view()),
 
 ]
